@@ -8,9 +8,30 @@ propagated through three later documents, so "check it against the notes" is not
 Every Dune query below can be re-fetched at **zero credit cost** with `getDuneQuery`
 (returns SQL + latest execution id) followed by `getExecutionResults`.
 
-All queries are Dune `is_temp: true` at the time of writing, which means they do not appear
-in library search and are not reachable by anyone outside the owning team. Making them
-public is a separate, deliberate step, not a side effect of publishing this article.
+**Which of these you can open, and which you cannot.** The nine queries in
+[`queries/`](./queries/) are public and clickable at `dune.com/queries/<id>`:
+
+[8139300](https://dune.com/queries/8139300) ·
+[8142735](https://dune.com/queries/8142735) ·
+[8139274](https://dune.com/queries/8139274) ·
+[8144008](https://dune.com/queries/8144008) ·
+[8144138](https://dune.com/queries/8144138) ·
+[8144156](https://dune.com/queries/8144156) ·
+[8144276](https://dune.com/queries/8144276) ·
+[8168061](https://dune.com/queries/8168061) ·
+[8298649](https://dune.com/queries/8298649) (display)
+
+The remaining IDs in the table below — the reconciliation and sampling queries, and the three
+from the fee-rate investigation — are **not** published. They are drafts, self-checks, and
+side branches, and several still carry working titles. For those, an ID is a provenance
+record rather than a working link; publishing them would be a separate, deliberate step.
+
+**A note on the published SQL.** Several of these queries emit Chinese string literals as
+*column values* — `'出'` / `'入'` (out / in), `'慢填'` (slow fill), `'非 Across'` (non-Across),
+`'完整月'` (complete month), `'**是该金库的付款方**'` (**is a payer of this vault**). They are
+left untranslated on purpose: changing them would produce a query that no longer matches the
+stored execution this analysis cites. Full glossary in
+[`queries/README.md`](./queries/README.md).
 
 ---
 
@@ -52,6 +73,7 @@ public is a separate, deliberate step, not a side effect of publishing this arti
 | 22 | 98.04% of output tokens verifiably leave the `relayer` address; 14,789 / 14,789 fills have an exactly-matching token transfer in the same transaction; 0 amount mismatches, 0 missing transfers | 8129310, 8129322, 8129540 | |
 | 23 | The 51.1% non-Across counterparty is a **contract**, deployed on Base **2026-04-20 18:14:27 UTC**, code length 36,198 bytes, deployer `0x9a8f92a8…` (= the Channel II operator) | 8223421 | `base.creation_traces` hit. Discriminator was written down **before** execution: a hit in either table is decisive for "contract"; two empty results would **not** license concluding "EOA". `contracts.contract_mapping` returned nothing — no name, no project label. |
 | 24 | Therefore the 48/51 split cannot describe 2026-02, 2026-03, or 2026-04-01→19 | derived from 8223421 + 8168061 | The counterparty did not exist. Its share in those months is zero by construction; the Across share was higher by an unmeasured amount. |
+| 25 | The figure's per-channel monthly counts, and "Channel III is 20,133 of 20,435 fills in 2026-04, 98.5%" | 8298649 | **Display query** — it pins the receiving addresses the analysis established, which the analysis queries deliberately did not. It presupposes the decomposition and must not be cited as evidence for it. Exhaustive (no HAVING threshold). Self-check is in the output: `month_total` reproduces all twelve totals from 8139300, which groups by filler instead. Cost 0.065 credits. |
 
 ---
 

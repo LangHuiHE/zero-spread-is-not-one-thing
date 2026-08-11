@@ -121,10 +121,10 @@ the depositor-equals-recipient rate, and the amount distribution.
 
 *Left: the metric as usually reported. Middle: the same months attributed to a receiving
 address. Right: the same attribution as a share of each month — which is where the "single
-phenomenon" reading visibly breaks. Attribution is exact, because a channel* is *a receiving
-address; the small residual band is fills below the source query's reporting threshold — 233
-of 87,479 over twelve months, 0.27%. Reproduce with*
-`figures/make_figures.py`.
+phenomenon" reading visibly breaks. Attribution is exhaustive: all 87,479 fills are assigned,
+and the twelve monthly totals reproduce those produced independently by a query that groups by
+filler instead. The pale band is genuinely unclassified — small recipients that never form a
+persistent channel. Reproduce with* `figures/make_figures.py`.
 
 The right panel is the argument in one image. The composition turns over three times in
 twelve months: Channel I dominates late 2025, Channel II takes over in February 2026, Channel

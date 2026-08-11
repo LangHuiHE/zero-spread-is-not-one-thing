@@ -40,6 +40,7 @@ QUERIES = {
     "06_channel1_erc20_flow_trace.sql": 8144156,
     "07_channel3_vault_outflow.sql": 8144276,
     "08_channel3_vault_inflow_by_counterparty.sql": 8168061,
+    "09_display_monthly_by_channel.sql": 8298649,
 }
 
 HEADER = re.compile(r"\A\s*/\*.*?\*/\s*", re.DOTALL)

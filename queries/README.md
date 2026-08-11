@@ -7,14 +7,30 @@ body as stored on Dune, with an English header prepended.
 
 | File | Dune query | What it answers | Article section | Credits |
 |---|---|---|---|---|
-| [`01_zero_spread_monthly_by_filler.sql`](./01_zero_spread_monthly_by_filler.sql) | 8139300 | Monthly zero-spread fills split by filler, with four fingerprint columns | §2, §5, figure | 0.158 |
-| [`02_zero_spread_monthly_by_recipient.sql`](./02_zero_spread_monthly_by_recipient.sql) | 8142735 | The same months split by **receiving address** — this is what actually separates the channels | §3, figure | 0.118 |
-| [`03_route_split_origin_x_filler.sql`](./03_route_split_origin_x_filler.sql) | 8139274 | Zero-spread concentration by origin chain × filler, all origins | §2 | 0.157 |
-| [`04_gas_cost_of_zero_spread_fills.sql`](./04_gas_cost_of_zero_spread_fills.sql) | 8144008 | Per-fill gas for zero-spread fills vs all fills | §5 | 1.478 |
-| [`05_channel1_payer_overlap.sql`](./05_channel1_payer_overlap.sql) | 8144138 | Do the same payers follow Channel I across its three receiving addresses? | §4 | 0.136 |
-| [`06_channel1_erc20_flow_trace.sql`](./06_channel1_erc20_flow_trace.sql) | 8144156 | Where money goes after it reaches a Channel I intermediary | §4 | 0.469 |
-| [`07_channel3_vault_outflow.sql`](./07_channel3_vault_outflow.sql) | 8144276 | Is the Channel III vault a destination or a pass-through? | §3, §6 | 0.379 |
-| [`08_channel3_vault_inflow_by_counterparty.sql`](./08_channel3_vault_inflow_by_counterparty.sql) | 8168061 | Who funds the Channel III vault, and what share is Across | §5, §6 | 0.988 |
+| [`01_zero_spread_monthly_by_filler.sql`](./01_zero_spread_monthly_by_filler.sql) | [8139300](https://dune.com/queries/8139300) | Monthly zero-spread fills split by filler, with four fingerprint columns | §2, §5, figure | 0.158 |
+| [`02_zero_spread_monthly_by_recipient.sql`](./02_zero_spread_monthly_by_recipient.sql) | [8142735](https://dune.com/queries/8142735) | The same months split by **receiving address** — this is what actually separates the channels | §3, figure | 0.118 |
+| [`03_route_split_origin_x_filler.sql`](./03_route_split_origin_x_filler.sql) | [8139274](https://dune.com/queries/8139274) | Zero-spread concentration by origin chain × filler, all origins | §2 | 0.157 |
+| [`04_gas_cost_of_zero_spread_fills.sql`](./04_gas_cost_of_zero_spread_fills.sql) | [8144008](https://dune.com/queries/8144008) | Per-fill gas for zero-spread fills vs all fills | §5 | 1.478 |
+| [`05_channel1_payer_overlap.sql`](./05_channel1_payer_overlap.sql) | [8144138](https://dune.com/queries/8144138) | Do the same payers follow Channel I across its three receiving addresses? | §4 | 0.136 |
+| [`06_channel1_erc20_flow_trace.sql`](./06_channel1_erc20_flow_trace.sql) | [8144156](https://dune.com/queries/8144156) | Where money goes after it reaches a Channel I intermediary | §4 | 0.469 |
+| [`07_channel3_vault_outflow.sql`](./07_channel3_vault_outflow.sql) | [8144276](https://dune.com/queries/8144276) | Is the Channel III vault a destination or a pass-through? | §3, §6 | 0.379 |
+| [`08_channel3_vault_inflow_by_counterparty.sql`](./08_channel3_vault_inflow_by_counterparty.sql) | [8168061](https://dune.com/queries/8168061) | Who funds the Channel III vault, and what share is Across | §5, §6 | 0.988 |
+
+All nine are public on Dune — click any ID above to open, fork, or re-run it.
+The dashboard built from query 09 is
+[here](https://dune.com/l44l9753/zero-spread-is-not-one-thing-across-v3-channel-decomposition).
+
+One more, kept separate because it is a different kind of thing:
+
+| File | Dune query | What it is | Credits |
+|---|---|---|---|
+| [`09_display_monthly_by_channel.sql`](./09_display_monthly_by_channel.sql) | 8298649 | **Display query.** Drives the article figure and the dashboard charts. It *pins* the receiving addresses that 01 and 02 established, and therefore presupposes the decomposition rather than demonstrating it. Cite 02 for the decomposition; cite this only for what the chart shows. | 0.065 |
+
+Building the decomposition a second time, in SQL, is what caught an error in the
+first version of the figure: it had classified slow fills by recipient address as a
+proxy, where the correct condition is `relayer = 0x0`. In 2026-02 the proxy
+over-counted by 81 fills. Neither version announced that it was wrong — the
+disagreement did.
 
 Reconciliation and sampling queries are **not** included as full text — they establish the
 sample's credibility rather than any claim in the article. Their IDs and scopes are listed in
@@ -23,12 +39,24 @@ sample's credibility rather than any claim in the article. Their IDs and scopes 
 
 ## Three things about these files
 
-**1. Output labels are not translated.** Several queries emit literal strings as *column
-values* — `'出'` / `'入'` (out / in), `'慢填'` (slow fill), `'**Across relayer**'` / `'非 Across'`
-(Across relayer / non-Across), `'A_origin=repay(LP费=0)'`. Translating them would produce a
-query that no longer matches the stored execution the article cites. They are left exactly as
-they are; the English header of each file says what each label means. Query *names* and
-*descriptions*, which are metadata and affect nothing, have been rewritten in English.
+**1. Output labels are not translated.** Several queries emit Chinese string literals as
+*column values*. Translating them would produce a query that no longer matches the stored
+execution the article cites, so they are left exactly as they are. Full glossary:
+
+| Literal | Meaning | Appears in |
+|---|---|---|
+| `'慢填'` | slow fill (`relayer = 0x0`) | 01 |
+| `'其余'` | others | 01 |
+| `'完整月'` | complete month | 02 |
+| `'**部分月 07-01~07-27**'` | **partial month, 07-01 to 07-27** | 02 |
+| `'出'` / `'入'` | out / in | 06, 07 |
+| `'**三地址间直接往来**'` | **direct transfer between the three addresses** | 06 |
+| `'**是该金库的付款方**'` | **is a payer of this vault** | 07 |
+| `'其他'` | other | 07, 08 |
+| `'非 Across'` | non-Across | 08 |
+
+Query *names* and *descriptions*, which are metadata and affect nothing, have been rewritten
+in English.
 
 **2. The SQL body is verbatim and independently checkable.** Run
 [`verify_against_dune.py`](./verify_against_dune.py) to re-fetch each query from Dune and diff

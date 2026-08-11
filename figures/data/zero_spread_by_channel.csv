@@ -1,0 +1,45 @@
+month,channel,n_fills
+2025-07,other / unclassified,16
+2025-08,other / unclassified,8
+2025-09,I · bridging relay,1
+2025-09,"V · slow fill (protocol, no filler)",35
+2025-09,other / unclassified,46
+2025-10,I · bridging relay,48
+2025-10,"V · slow fill (protocol, no filler)",16
+2025-10,other / unclassified,28
+2025-11,I · bridging relay,259
+2025-11,"V · slow fill (protocol, no filler)",55
+2025-11,other / unclassified,61
+2025-12,I · bridging relay,569
+2025-12,"V · slow fill (protocol, no filler)",59
+2025-12,other / unclassified,126
+2026-01,I · bridging relay,426
+2026-01,"V · slow fill (protocol, no filler)",49
+2026-01,other / unclassified,19
+2026-02,I · bridging relay,427
+2026-02,II · dust self-transfer,1051
+2026-02,III · payment funnel,52
+2026-02,"V · slow fill (protocol, no filler)",148
+2026-02,other / unclassified,419
+2026-03,I · bridging relay,84
+2026-03,II · dust self-transfer,1429
+2026-03,III · payment funnel,1071
+2026-03,"V · slow fill (protocol, no filler)",16
+2026-03,other / unclassified,212
+2026-04,I · bridging relay,27
+2026-04,II · dust self-transfer,43
+2026-04,III · payment funnel,20133
+2026-04,IV · $10 clock loop,4
+2026-04,other / unclassified,228
+2026-05,I · bridging relay,601
+2026-05,II · dust self-transfer,9
+2026-05,III · payment funnel,23538
+2026-05,IV · $10 clock loop,1857
+2026-05,"V · slow fill (protocol, no filler)",112
+2026-05,other / unclassified,70
+2026-06,I · bridging relay,264
+2026-06,II · dust self-transfer,19
+2026-06,III · payment funnel,24954
+2026-06,IV · $10 clock loop,8636
+2026-06,"V · slow fill (protocol, no filler)",96
+2026-06,other / unclassified,158
