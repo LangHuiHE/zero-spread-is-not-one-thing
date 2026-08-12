@@ -20,7 +20,23 @@ All nine are public on Dune — click any ID above to open, fork, or re-run it.
 The dashboard built from query 09 is
 [here](https://dune.com/l44l9753/zero-spread-is-not-one-thing-across-v3-channel-decomposition).
 
-One more, kept separate because it is a different kind of thing:
+## Three that overturned earlier claims
+
+Run after the article's first draft, each to test something the draft had asserted or
+extrapolated. All three came back negative, and the article was changed.
+
+| File | Dune query | What it killed | Credits |
+|---|---|---|---|
+| [`10_d1_deployer_profile.sql`](./10_d1_deployer_profile.sql) | 8299327 | The "cross-channel hard link". The shared deployer turns out to have deployed 173 contracts including the Across Base SpokePool itself — it is infrastructure, not an operator. §5 | 0.178 |
+| [`11_d2_vault_inflow_may_june.sql`](./11_d2_vault_inflow_may_june.sql) | 8299358 | "48.38%" as a structural ratio. Across's share of the vault's inflow reads 44.0% / 73.2% / 48.4% across three consecutive months. §6 | 1.330 |
+| [`12_d3d4_channel1_lifetime_flows.sql`](./12_d3d4_channel1_lifetime_flows.sql) | 8299370 | "Channel I was always a relay". Two of its three addresses are lossless to the cent; the third — carrying most of the volume — pays out ≈1.98× what it takes in for seven straight months. §4 | **12.737** |
+
+⚠ Query 12 is the largest cost-estimate miss in this project: **27× its anchor**, against a
+window only 11× longer, on the same table with the same address predicate.
+`erc20_base.evt_transfer` does not scale linearly with window length. Do not anchor a
+long-window run of it on a short-window one.
+
+## One more, kept separate because it is a different kind of thing:
 
 | File | Dune query | What it is | Credits |
 |---|---|---|---|

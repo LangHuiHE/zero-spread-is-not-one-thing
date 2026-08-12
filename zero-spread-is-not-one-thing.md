@@ -111,7 +111,7 @@ the depositor-equals-recipient rate, and the amount distribution.
 
 | | Channel | Active | Fingerprint | What it actually is |
 |---|---|---|---|---|
-| **I** | Bridging relay | 2025-10 → 2026-07 | origin = Arbitrum **100.0%** every month; USDC median $2.93 → $17,182; single token; depositor ≠ recipient 100%; receiving address rotated three times | A bridging product. User deposits on Arbitrum → filler pays an intermediary contract on Base → the intermediary forwards to the user. |
+| **I** | Bridging relay *(two of three addresses)* | 2025-10 → 2026-07 | origin = Arbitrum **100.0%** every month; USDC median $2.93 → $17,182; single token; depositor ≠ recipient 100%; receiving address rotated three times | A bridging product: user deposits on Arbitrum → filler pays an intermediary on Base → intermediary forwards to the user. **Measured for the 2nd and 3rd addresses. The 1st — which carries most of the volume — behaves differently and is not characterised.** See §4. |
 | **II** | Dust self-transfer | 2026-02 → 2026-07 | USDC median **$0.10**; depositor = recipient **100%**; low volume throughout | Someone moving dust to themselves. Purpose untested. |
 | **III** | Payment funnel | 2026-02, ramps 2026-04 | USDC median ~$10.6; **thousands** of distinct payers per month; depositor = recipient **0%**; four origin chains | Cross-chain checkout settlement. The vault forwards 99.5% onward to Base's official `commerce-payments` `ERC3009PaymentCollector`. |
 | **IV** | $10 clock loop | 2026-05 → | **exactly $10.00**; origin = Arbitrum only; depositor = recipient 49%–96%; fires on round time boundaries | Automated loop. Purpose untested. |
@@ -145,10 +145,13 @@ is the on-chain leg. Whatever these businesses actually charge — a front-end f
 spread, a subscription, an off-chain arrangement with the filler — happens somewhere this
 data cannot see, and its scale is unknown. It could be larger than anything on this page.
 
-**Channel I in particular has a broken economic story.** Its fee point has not been located:
-front-end fee on notional, exchange-rate spread, and an off-chain arrangement with the filler
-are all live candidates, and **none of them has been tested**. Channel I should not be listed
-alongside the others as if it were equally understood, and this sentence is the reason.
+**Channel I in particular has a broken economic story.** Its fee point has not been located.
+Of three candidates — a front-end fee on notional, an exchange-rate spread, an off-chain
+arrangement with the filler — only the first is visible in this data, and it is **excluded**
+for two of the three relay addresses, which are lossless to the cent. The other two remain
+untestable here. And the first address, carrying most of the volume, does not behave like the
+other two at all. Channel I should not be listed alongside the others as if it were equally
+understood, and this paragraph is the reason.
 
 ---
 
@@ -182,9 +185,39 @@ Two limits on that, stated plainly because they matter:
 - This proves *the same users kept using the service after the receiving address changed*. It
   does **not** prove the three addresses share a controller. That would need a funding
   relationship, and none was found.
-- The flow tracing covers **2026-07 only**. By then the second address held $7,818 of residual
-  volume, and the **first address was never traced at all**. "Channel I was always a relay" is
-  an extrapolation, not a measurement.
+- The flow tracing initially covered **2026-07 only**, when the second address held $7,818 of
+  residual volume and the **first address had never been traced at all**. "Channel I was always
+  a relay" was, at that point, an extrapolation rather than a measurement.
+
+### The extrapolation was then tested, and it failed
+
+Extending the trace to all three addresses across their whole active span — about ten months
+instead of one — splits them cleanly, and not the way the extrapolation assumed.
+
+| Address | ERC-20 out ÷ in | Outbound landing on its own Across payers |
+|---|---|---|
+| **B** `0xbcbb05dd…` | **1.00×**, every month, to the cent | 32.5% – 97.2% |
+| **C** `0x50554959…` | **1.00×** | 96.3% |
+| **A** `0x0000…60f6e8` | **≈1.98×**, every month, for seven months | **9.1% – 36.9%** |
+
+B and C are lossless pass-throughs: in December, May, July, whichever month you pick, the USDC
+and WETH leaving equals what arrived, to the cent. That is what a relay looks like.
+
+**A is not that.** It pays out about twice what it takes in, month after month; most of its
+outflow does not reach its own Across payers; and its inbound side is thousands of transfers
+from six to thirteen counterparties across eight to nineteen tokens, against two tokens going
+out. B and C move dozens of transfers among a handful of counterparties.
+
+I am not going to say what A is. The two-to-one imbalance is unexplained and there may be a
+mundane reason I have not found. What can be said is narrower and more useful: **the relay
+reading is a measurement for B and C and is not established for A — and A carries the majority
+of the channel's lifetime volume.** The caveat two paragraphs up was not decorative. It was
+load-bearing, and the load broke it.
+
+This also settles one of the three fee-point candidates. Because B and C are lossless to the
+cent, **a front-end fee taken at the relay is excluded** for them. The other two candidates —
+an FX spread, or an off-chain arrangement with the filler — remain exactly as unmeasurable as
+before. One of three, by exclusion, on two of three addresses.
 
 The general lesson is the one that cost the most to learn here: **a fingerprint that is
 correct on-chain can be wrong economically, and it will not announce that it is wrong.** The
@@ -209,19 +242,41 @@ The claims that do not survive the decomposition:
 | "Zero-spread behaviour is spreading — two other firms are copying it" | Those two are the $10 clock loop, an unrelated channel |
 | "The vault is served exclusively by one filler" | Three fillers served it in July 2026. The *proportion* stands — 99.902% of Across-side value — but exclusivity does not |
 
-One genuine cross-channel observation survives, and it is worth flagging rather than burying.
+There was very nearly a fifth retraction here, and the way it did not happen is worth the
+space.
+
 The largest single counterparty feeding the Channel III vault — 51.1% of its inflow in the
 July window — is a **contract**, deployed on Base at **2026-04-20 18:14:27 UTC**, 36,198 bytes
-of code. Its deployer is `0x9a8f92a8…`: **the Channel II operator**. That is a direct on-chain
-link between two channels I had described as independent. It is one link, it is unexplained,
-and it is not enough to merge them — but it is exactly the sort of thing a decomposition that
-stopped at "four separate channels" would have declared and then never revisited.
+of code. Its deployer address is the same address that receives Channel II's dust. On its
+face that is a direct on-chain link between two channels this article calls unrelated, and it
+would have been an easy and interesting thing to report.
 
-The deployment date also does useful work. Because that counterparty did not exist before
-20 April 2026, the 48/51 inflow split **cannot** describe February, March, or the first three
-weeks of April. In those months Across's share of the vault's inflow was necessarily higher —
-by how much is unmeasured. This is a case where a caveat that had been stated as "untested"
-turned out, at zero additional cost, to be partly determinable.
+Before reporting it I wrote down what would make it real: *if this address deployed a handful
+of contracts and they sit inside the cluster, the link is strong; if it deployed thousands, it
+is a deployment factory and the link is worth nothing.* Then I ran it.
+
+**173 contracts, deployed between August 2023 and August 2026, still active.** Only one of
+them is in the cluster. It did not deploy the vault, the filler that serves the vault, any of
+Channel I's three relay addresses, or Channel IV's recipient. And the second contract it ever
+deployed is `0x09aea4b2…` — **the Across SpokePool on Base itself**, the contract every fill
+in this article is decoded from.
+
+So the address is general-purpose deployment infrastructure, not an operator, and "these two
+channels share a deployer" says roughly as much as "these two channels are both on Base."
+**The link is dead.** Channel II's involvement is that a deployer address is receiving dust at
+itself across chains — which is what deployer addresses do, not a business.
+
+Two things survive from the exercise. First, the deployment date still does real work:
+because that counterparty did not exist before 20 April 2026, the 48/51 inflow split **cannot**
+describe February, March, or the first three weeks of April. In those months Across's share of
+the vault's inflow was necessarily higher — by how much is unmeasured. A caveat previously
+stated as "untested" turned out to be partly determinable at zero cost.
+
+Second, and more to the point of this article: the discriminator was written down *before*
+the query ran, with both outcomes and their consequences spelled out. Had it been written
+afterwards, 173 would have been easy to read as "a modest number, mostly unrelated, so the
+link stands." It is not obviously a factory. It only becomes one once you have committed in
+advance to what a factory would look like.
 
 An independent hint that the channels differ mechanically: zero-spread fills cost
 **9.644 × 10⁻⁷ ETH** of gas each, against **2.965 × 10⁻⁶ ETH** for fills generally — about
@@ -270,11 +325,15 @@ Within that limit, the checks that were run:
 
 Three scope limits that constrain the strongest claims:
 
-1. Channel III's inflow decomposition — Across **48.38%**, one non-Across source **51.12%** —
-   covers **2026-07-01 to 07-27 only**, a partial month. May and June are untested. February,
-   March and most of April are *bounded* rather than untested: the non-Across counterparty was
-   not deployed until 20 April, so its share in those months is zero by construction and the
-   Across share was higher. How much higher is unmeasured.
+1. Channel III's inflow decomposition is **not a stable ratio**. Across's share of the vault's
+   USDC inflow reads **44.0%** in May 2026, **73.2%** in June, and **48.4%** in the partial
+   July window. It moves by thirty points month to month. Any single figure — including the
+   48% that this analysis reported first — describes one month and nothing more.
+   February, March and most of April are separately *bounded*: the large non-Across
+   counterparty was not deployed until 20 April, so its share is zero there by construction.
+   And all three percentages are **upper bounds** on Across's share of total inflow value: they
+   are computed on USDC alone, while the non-Across side brings in fourteen to twenty-five
+   different tokens whose value is excluded.
 2. Payer counts are not user counts. If each checkout derives a fresh address, 9,783 payers
    systematically overstates users. Untested, in either direction.
 3. **Amounts here may be read as lower bounds; counts may not.** Counts are subject to at least
@@ -298,15 +357,21 @@ plausible, it trended, and it was meaningless.
 
 The open questions I could not close, in order of how much they would change the picture:
 
-1. What the non-Across source supplying 51% of the Channel III vault actually is. No public
-   label, and no independent source available in this environment to identify it.
-2. Whether Across's 48% share of that vault holds in the months before July 2026.
-3. Whether Channel I's first receiving address behaved like the later two — i.e. whether the
-   relay reading holds for the period that carries most of the volume.
-4. Where Channel I's bridging product actually charges. Three candidates — front-end fee on
-   notional, FX spread, or an off-chain arrangement with the filler — and **none of them has
-   been tested**. Until one is, the economic story for Channel I is incomplete, and that
-   incompleteness travels with every statement made about it.
+1. **What Channel I's first receiving address is doing.** It pays out about twice what it
+   takes in, every month for seven months, and most of that outflow does not reach its own
+   payers. It is not the relay the other two addresses are, and it carries most of the
+   channel's volume. This is the largest hole in the analysis and it opened *after* the
+   obvious question was finally asked.
+2. **What the non-Across sources funding the Channel III vault are.** No public label, no
+   independent data source available here, and the leading one changes between months —
+   May's largest is a different address from June's.
+3. **Why Across's share of that vault swings between 44% and 73%** across three consecutive
+   months. Either the operator's routing changed or its non-Across volume is lumpy; nothing
+   here distinguishes those.
+4. **Where Channel I charges.** One of three candidates is excluded — the relay is lossless
+   for two of its three addresses — and the remaining two, an FX spread and an off-chain
+   arrangement with the filler, are not visible in any on-chain data. This may simply not be
+   answerable from a block explorer, which is itself worth saying out loud.
 
 ---
 

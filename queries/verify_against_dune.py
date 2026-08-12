@@ -41,6 +41,9 @@ QUERIES = {
     "07_channel3_vault_outflow.sql": 8144276,
     "08_channel3_vault_inflow_by_counterparty.sql": 8168061,
     "09_display_monthly_by_channel.sql": 8298649,
+    "10_d1_deployer_profile.sql": 8299327,
+    "11_d2_vault_inflow_may_june.sql": 8299358,
+    "12_d3d4_channel1_lifetime_flows.sql": 8299370,
 }
 
 HEADER = re.compile(r"\A\s*/\*.*?\*/\s*", re.DOTALL)

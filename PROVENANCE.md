@@ -21,10 +21,17 @@ Every Dune query below can be re-fetched at **zero credit cost** with `getDuneQu
 [8168061](https://dune.com/queries/8168061) ·
 [8298649](https://dune.com/queries/8298649) (display)
 
-The remaining IDs in the table below — the reconciliation and sampling queries, and the three
-from the fee-rate investigation — are **not** published. They are drafts, self-checks, and
-side branches, and several still carry working titles. For those, an ID is a provenance
-record rather than a working link; publishing them would be a separate, deliberate step.
+Three more from the fee-rate side investigation are public but not part of this article's
+argument — they support a separate finding about where a multi-chain LP fee decline did *not*
+come from: [8223421](https://dune.com/queries/8223421) ·
+[8223497](https://dune.com/queries/8223497) · [8223653](https://dune.com/queries/8223653).
+**8223497 in particular must be filtered on its `selfcheck` column before use**: two sides of
+its identity fail to align in five of nine months, and the result set contains one orphan row
+reading 8,271 bps that is not a fee rate at all.
+
+The reconciliation and sampling IDs in the table below are **not** published. They are drafts
+and self-checks, several still carrying working titles. For those, an ID is a provenance
+record rather than a working link.
 
 **A note on the published SQL.** Several of these queries emit Chinese string literals as
 *column values* — `'出'` / `'入'` (out / in), `'慢填'` (slow fill), `'非 Across'` (non-Across),
@@ -73,6 +80,9 @@ stored execution this analysis cites. Full glossary in
 | 22 | 98.04% of output tokens verifiably leave the `relayer` address; 14,789 / 14,789 fills have an exactly-matching token transfer in the same transaction; 0 amount mismatches, 0 missing transfers | 8129310, 8129322, 8129540 | |
 | 23 | The 51.1% non-Across counterparty is a **contract**, deployed on Base **2026-04-20 18:14:27 UTC**, code length 36,198 bytes, deployer `0x9a8f92a8…` (= the Channel II operator) | 8223421 | `base.creation_traces` hit. Discriminator was written down **before** execution: a hit in either table is decisive for "contract"; two empty results would **not** license concluding "EOA". `contracts.contract_mapping` returned nothing — no name, no project label. |
 | 24 | Therefore the 48/51 split cannot describe 2026-02, 2026-03, or 2026-04-01→19 | derived from 8223421 + 8168061 | The counterparty did not exist. Its share in those months is zero by construction; the Across share was higher by an unmeasured amount. |
+| 26 | The shared deployer is a factory, not an operator: **173 contracts**, Aug 2023 → Aug 2026, only one in the cluster; it deployed neither the vault, nor its filler, nor Channel I's three relays, nor Channel IV's recipient — but it did deploy the **Across Base SpokePool** | 8299327 | Discriminator pre-registered before execution: a handful in-cluster = strong link, thousands = factory = worthless. 173 fell between; the SpokePool hit decided it. Cost 0.178. |
+| 27 | Across's share of Channel III vault USDC inflow: **44.0%** (2026-05), **73.2%** (2026-06), vs 48.4% (partial 2026-07) | 8299358 | Pre-registered self-check hit exactly: Across-side transfer counts 23,538 / 24,954 equal the Channel III fill counts from 8298649. ⚠ All three are **upper bounds** on share of total value — computed on USDC only, while the non-Across side brings 14–25 tokens. Cost 1.330. |
+| 28 | Channel I relay B and C are lossless (out ÷ in = **1.00×** to the cent, every month); relay A is **≈1.98×** for seven straight months with only 9–37% of outflow reaching its own payers | 8299370 | Pre-registered self-checks: B's July in/out $7,818.59 both sides — hit exactly; C's July amount $257,566.03 — hit exactly. ⚠ The pre-registered *transfer counts* (47/45) did **not** match (59/54) — those documented counts were USDC-only and this query covers all tokens; the expectation was mis-specified, not the result. Cost **12.737** against a 0.469 anchor for the same table and addresses over 1/11th the window — 27×, super-linear. |
 | 25 | The figure's per-channel monthly counts, and "Channel III is 20,133 of 20,435 fills in 2026-04, 98.5%" | 8298649 | **Display query** — it pins the receiving addresses the analysis established, which the analysis queries deliberately did not. It presupposes the decomposition and must not be cited as evidence for it. Exhaustive (no HAVING threshold). Self-check is in the output: `month_total` reproduces all twelve totals from 8139300, which groups by filler instead. Cost 0.065 credits. |
 
 ---
