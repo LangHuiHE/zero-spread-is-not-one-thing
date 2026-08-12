@@ -19,7 +19,7 @@ signature, and the mixture turns over three times in twelve months.
 |---|---|
 | [`zero-spread-is-not-one-thing.md`](./zero-spread-is-not-one-thing.md) | The article. |
 | [`PROVENANCE.md`](./PROVENANCE.md) | Every number in the article → the Dune query that produced it, with the query's scope. |
-| [`queries/`](./queries/) | The eight queries the article's claims rest on. SQL verbatim, English headers explaining purpose, discriminator, scope limits and measured cost. `verify_against_dune.py` re-fetches and diffs them at zero cost. |
+| [`queries/`](./queries/) | The eight queries the article's claims rest on, plus one display query that draws the figure. SQL verbatim, English headers explaining purpose, discriminator, scope limits and measured cost. All nine are public on Dune. `verify_against_dune.py` re-fetches and diffs them at zero cost. |
 | [`figures/make_figures.py`](./figures/make_figures.py) | Reproduces the figure, offline from committed snapshots or by re-fetching from Dune. |
 | [`figures/data/`](./figures/data/) | Query-result snapshots, committed so the figure reproduces without an API key. `zero_spread_by_channel.csv` drives the figure. `zero_spread_monthly.csv` is the by-filler cut behind the table in §2. The other two are the earlier by-recipient cut, kept because disagreeing with them is what exposed a misclassification in the first version of the figure. |
 
